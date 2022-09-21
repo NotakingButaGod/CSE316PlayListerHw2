@@ -7,7 +7,7 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
-
+import AddSong_Transaction from './transactions/AddSong_Transaction.js';
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
 
@@ -83,6 +83,24 @@ class App extends React.Component {
             // IS AN AFTER EFFECT
             this.db.mutationCreateList(newList);
 
+            // SO IS STORING OUR SESSION DATA
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
+
+    createNewSong = (title1,artist1,youtubeid,index) => {
+        let newSong = {
+            title: title1,
+            artist: artist1,
+            youTubeId: youtubeid
+        };
+        let newList = this.state.currentList;
+        newList.songs.push(newSong);
+        this.setState(prevState => ({
+            currentList: newList,
+        }), () => {
+            // updates the list after adding a song
+            this.db.mutationUpdateList(this.state.currentList);
             // SO IS STORING OUR SESSION DATA
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
@@ -235,6 +253,10 @@ class App extends React.Component {
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
     }
+    addAddSongTransaction = () => {
+        let transaction = new AddSong_Transaction(this);
+        this.tps.addTransaction(transaction);
+    }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
@@ -300,6 +322,7 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
+                    createNewSongCallback={this.addAddSongTransaction}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
