@@ -63,6 +63,10 @@ export default class SongCard extends React.Component {
         let keySongpair = {key: this.props.index, song: this.props.song};
         this.props.markSongForDeletion(keySongpair);
     }
+    handledbClick = (event) =>{
+        let keySongpair = {key: this.props.index, song: this.props.song};
+        this.props.markSongForEdition(keySongpair);
+    }
 
     render() {
         const { song } = this.props;
@@ -84,6 +88,7 @@ export default class SongCard extends React.Component {
                 onDragLeave={this.handleDragLeave}
                 onDrop={this.handleDrop}
                 draggable="true"
+                onDoubleClick={this.handledbClick}
             >
                 {num}.
                 <a href={hyperlink}>{song.title} by {song.artist}</a>

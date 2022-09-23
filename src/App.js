@@ -9,9 +9,11 @@ import jsTPS from './common/jsTPS.js';
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 import AddSong_Transaction from './transactions/AddSong_Transaction.js';
 import DeleteSong_Transaction from './transactions/DeleteSong_Transaction.js';
+import EditSong_Transaction from './transactions/EditSong_Transaction.js';
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
 import DeleteSongModal from './components/DeleteSongModal.js';
+import EditSongModal from './components/EditSongModal.js';
 
 // THESE REACT COMPONENTS ARE IN OUR UI
 import Banner from './components/Banner.js';
@@ -39,7 +41,8 @@ class App extends React.Component {
             listKeyPairMarkedForDeletion : null,
             currentList : null,
             sessionData : loadedSessionData,
-            SongKeyPairMarkedForDeletion : null
+            SongKeyPairMarkedForDeletion : null,
+            SongKeyPairMarkedForEdition : null
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -163,6 +166,7 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+
     markSongForDeletion = (keyPair) => {
         this.setState(prevState => ({
             SongKeyPairMarkedForDeletion : keyPair
@@ -193,6 +197,41 @@ class App extends React.Component {
         this.hideDeleteSongModal();
     }
     
+    markSongForEdition = (keyPair) => {
+        this.setState(prevState => ({
+            SongKeyPairMarkedForEdition : keyPair
+        }), () => {
+            // PROMPT THE USER
+            this.showEditSongModal();
+        });
+    }
+    EditSong = (id,name,artist,youtubeid) => {
+        let newList = this.state.currentList;
+        //console.log(this.state.currentList);
+        if (name !== "") {
+            newList.songs[id].title = name;
+        }
+        if (artist !== "") {
+            newList.songs[id].artist = artist;
+        }
+        if (youtubeid !== "") {
+            newList.songs[id].youTubeId = youtubeid;
+        }
+        // AND FROM OUR APP STATE
+        this.setState(prevState => ({
+            SongKeyPairMarkedForEdition: null,
+            currentList: newList,
+        }), () => {
+            this.db.mutationUpdateList(this.state.currentList);
+            // SO IS STORING OUR SESSION DATA
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
+    EditMarkedSong = (id,name,artist,youtubeid) => {
+        this.EditSong(id,name,artist,youtubeid);
+        this.hideEditSongModal();
+    }
+
     deleteMarkedList = () => {
         this.deleteList(this.state.listKeyPairMarkedForDeletion.key);
         this.hideDeleteListModal();
@@ -236,6 +275,7 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
@@ -312,6 +352,10 @@ class App extends React.Component {
         let transaction = new DeleteSong_Transaction(this);
         this.tps.addTransaction(transaction);
     }
+    addEditSongTransaction = () => {
+        let transaction = new EditSong_Transaction(this);
+        this.tps.addTransaction(transaction);
+    }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
@@ -355,9 +399,19 @@ class App extends React.Component {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.add("is-visible");
     }
-
     hideDeleteSongModal() {
         let modal = document.getElementById("delete-song-modal");
+        modal.classList.remove("is-visible");
+    }
+    showEditSongModal() {
+        let modal = document.getElementById("edit-song-modal");
+        modal.classList.add("is-visible");
+        document.getElementById("titleinput").value = this.state.SongKeyPairMarkedForEdition.song.title;
+        document.getElementById("artistinput").value = this.state.SongKeyPairMarkedForEdition.song.artist;
+        document.getElementById("youtubeidinput").value = this.state.SongKeyPairMarkedForEdition.song.youTubeId;
+    }
+    hideEditSongModal() {
+        let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
     }
     render() {
@@ -392,6 +446,7 @@ class App extends React.Component {
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction}
                     markSongForDeletion={this.markSongForDeletion}
+                    markSongForEdition={this.markSongForEdition}
                 />
                 <Statusbar 
                     currentList={this.state.currentList} />
@@ -405,7 +460,11 @@ class App extends React.Component {
                     hideDeleteSongModal={this.hideDeleteSongModal}
                     deleteSongCallback={this.addDeleteSongTransaction}
                 />
-                
+                <EditSongModal
+                    hideEditSongModal={this.hideEditSongModal}
+                    EditSongCallback={this.addEditSongTransaction}
+                />
+
             </div>
         );
     }
