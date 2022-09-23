@@ -17,10 +17,11 @@ export default class AddSong_Transaction extends jsTPS_Transaction {
     doTransaction() {
         this.app.createNewSong("Untitled","Unknown","dQw4w9WgXcQ", this.app.state.currentList.songs.length);
         this.id = this.app.state.currentList.songs.length;
-        console.log(this.id);
+        //console.log(this.id);
     }
     
     undoTransaction() {
-        
+        this.app.deleteSong(this.id-1);
+        //console.log(this.id);
     }
 }
