@@ -135,6 +135,7 @@ body {
   font-size:24pt;
 }
 
+
 .playlister-button, .playlister-button-disabled {
   font-size:36pt;
   border-width: 0px;
@@ -177,7 +178,16 @@ body {
   border-radius: 5px;
 }
 
-
+.toolbar-button-disabled{
+  font-size: 36pt;
+  border-width: 1px;
+  border-color: black;  
+  border-style: solid;
+  box-shadow: 2px 4px #888888;
+  border-radius: 5px;
+  opacity: 0.25; 
+  cursor: not-allowed;
+}
 /* THIS STYLE SHEET MANAGES STYLE FOR OUR MODAL, i.e. DIALOG BOX */
 
 .modal {

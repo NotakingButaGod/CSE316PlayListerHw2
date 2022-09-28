@@ -1,6 +1,6 @@
 import React from "react";
-
 export default class EditToolbar extends React.Component {
+    
     render() {
         const { canAddSong, canUndo, canRedo, canClose, 
                 undoCallback, redoCallback, closeCallback, createNewSongCallback} = this.props;
@@ -8,10 +8,10 @@ export default class EditToolbar extends React.Component {
         let undoClass = "toolbar-button";
         let redoClass = "toolbar-button";
         let closeClass = "toolbar-button";
-        if (canAddSong) addSongClass += " disabled";
-        if (canUndo) undoClass += " disabled";
-        if (canRedo) redoClass += " disabled";
-        if (canClose) closeClass += " disabled";
+        if (!canAddSong) addSongClass += "-disabled";
+        if (!canUndo) undoClass += "-disabled";
+        if (!canRedo) redoClass += "-disabled";
+        if (!canClose) closeClass += "-disabled";
         return (
             <div id="edit-toolbar">
             <input 
@@ -20,6 +20,7 @@ export default class EditToolbar extends React.Component {
                 value="+" 
                 className={addSongClass}
                 onClick={createNewSongCallback}
+                disabled={canAddSong ? false : true}
             />
             <input 
                 type="button" 
@@ -27,6 +28,8 @@ export default class EditToolbar extends React.Component {
                 value="⟲" 
                 className={undoClass} 
                 onClick={undoCallback}
+                disabled={canUndo ? false : true}
+                //onKeyDown={this.handlekeydown}
             />
             <input 
                 type="button" 
@@ -34,6 +37,8 @@ export default class EditToolbar extends React.Component {
                 value="⟳" 
                 className={redoClass} 
                 onClick={redoCallback}
+                disabled={canRedo ? false : true}
+                //onKeyDown={this.handlekeydown}
             />
             <input 
                 type="button" 
@@ -41,6 +46,7 @@ export default class EditToolbar extends React.Component {
                 value="&#x2715;" 
                 className={closeClass} 
                 onClick={closeCallback}
+                disabled={canClose ? false : true}
             />
         </div>
         )

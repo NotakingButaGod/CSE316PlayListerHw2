@@ -26,7 +26,7 @@ import Statusbar from './components/Statusbar.js';
 class App extends React.Component {
     constructor(props) {
         super(props);
-
+        
         // THIS IS OUR TRANSACTION PROCESSING SYSTEM
         this.tps = new jsTPS();
 
@@ -414,15 +414,38 @@ class App extends React.Component {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
     }
+
+    componentDidMount() {
+        window.addEventListener('keydown', this.handlekeydown); // maybe focus the control key and then do key down on the z and y key
+    }
+    handlekeydown = (event) => {
+        if((event.metaKey || event.ctrlKey) && event.key === 'z'){
+            if(this.tps.hasTransactionToUndo()){
+                this.undo();
+            }
+            //this.undo();
+        }
+        if((event.metaKey || event.ctrlKey) && event.key === 'y'){
+            if(this.tps.hasTransactionToRedo()){
+                this.redo();
+            }
+        }
+    }
+    componentWillUnmount(){
+        window.removeEventListener('keydown', this.handlekeydown);
+    }
+    
     render() {
-        let canAddSong = this.state.currentList !== null;
-        let canUndo = this.tps.hasTransactionToUndo();
-        let canRedo = this.tps.hasTransactionToRedo();
-        let canClose = this.state.currentList !== null;
+        let canAddSong = this.state.currentList !== null ? true : false;
+        let canUndo = this.tps.hasTransactionToUndo() ? true : false;
+        let canRedo = this.tps.hasTransactionToRedo() ? true : false;
+        let canClose = this.state.currentList !== null ? true : false;
+        let canAddList = this.state.currentList !== null ? false : true;
         return (
             <div id="root">
                 <Banner />
                 <SidebarHeading
+                    canAddList={canAddList}
                     createNewListCallback={this.createNewList}
                 />
                 <SidebarList
