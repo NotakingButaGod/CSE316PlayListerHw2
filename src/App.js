@@ -279,6 +279,7 @@ class App extends React.Component {
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: newCurrentList,
@@ -286,11 +287,12 @@ class App extends React.Component {
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
-            this.tps.clearAllTransactions();
+            //this.tps.clearAllTransactions();
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: null,
@@ -298,7 +300,7 @@ class App extends React.Component {
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
-            this.tps.clearAllTransactions();
+            //this.tps.clearAllTransactions();
         });
     }
     setStateWithUpdatedList(list) {
@@ -357,6 +359,7 @@ class App extends React.Component {
         this.tps.addTransaction(transaction);
     }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
+
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
             this.tps.undoTransaction();
@@ -367,6 +370,7 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING A REDO
     redo = () => {
+        
         if (this.tps.hasTransactionToRedo()) {
             this.tps.doTransaction();
 
@@ -423,9 +427,10 @@ class App extends React.Component {
             if(this.tps.hasTransactionToUndo()){
                 this.undo();
             }
+            
             //this.undo();
         }
-        if((event.metaKey || event.ctrlKey) && event.key === 'y'){
+        else if((event.metaKey || event.ctrlKey) && event.key === 'y'){
             if(this.tps.hasTransactionToRedo()){
                 this.redo();
             }
@@ -437,10 +442,12 @@ class App extends React.Component {
     
     render() {
         let canAddSong = this.state.currentList !== null ? true : false;
-        let canUndo = this.tps.hasTransactionToUndo() ? true : false;
+        let canUndo = (this.tps.hasTransactionToUndo()) ? true : false;
         let canRedo = this.tps.hasTransactionToRedo() ? true : false;
         let canClose = this.state.currentList !== null ? true : false;
         let canAddList = this.state.currentList !== null ? false : true;
+        console.log("canUndo: " + canUndo);
+        console.log("canRedo: " + canRedo);
         return (
             <div id="root">
                 <Banner />
@@ -456,6 +463,7 @@ class App extends React.Component {
                     renameListCallback={this.renameList}
                 />
                 <EditToolbar
+                    
                     canAddSong={canAddSong}
                     canUndo={canUndo}
                     canRedo={canRedo}
