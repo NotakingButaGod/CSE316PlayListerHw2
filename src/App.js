@@ -149,6 +149,7 @@ class App extends React.Component {
             newKeyNamePairs.splice(keyIndex, 1);
 
         // AND FROM OUR APP STATE
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : null,
             currentList: newCurrentList,
